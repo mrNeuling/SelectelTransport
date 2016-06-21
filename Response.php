@@ -8,6 +8,8 @@ namespace SelectelTransport;
  */
 class Response
 {
+    const RESPONSE_CODE_OK = 200;
+    const RESPONSE_CODE_CREATED = 201;
     const RESPONSE_CODE_NO_CONTENT = 204;
     const RESPONSE_CODE_FORBIDDEN = 403;
 
