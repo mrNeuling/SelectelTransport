@@ -49,7 +49,7 @@ class Request
 
     /**
      * Контент запроса (для POST и PUT)
-     * @var string
+     * @var array
      */
     private $content = null;
 
@@ -153,10 +153,12 @@ class Request
 
     /**
      * Устанавливает данные для POST и PUT запросов
-     * @param string $content
+     * @param array $content
      */
-    public function setContent($content)
+    public function setContent(array $content)
     {
         $this->content = $content;
+        
+        return $this;
     }
 }
