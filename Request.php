@@ -19,6 +19,17 @@ class Request
     const REQUEST_METHOD_HEAD = 'HEAD';
 
     /**
+     * Массив допустимых методов запросов
+     * @var array
+     */
+    private static $allowedMethods = [
+        self::REQUEST_METHOD_GET,
+        self::REQUEST_METHOD_POST,
+        self::REQUEST_METHOD_PUT,
+        self::REQUEST_METHOD_HEAD,
+    ];
+
+    /**
      * Ссылка на объект cUrl
      * @var null|resource
      */
@@ -29,6 +40,18 @@ class Request
      * @var array
      */
     private $headers = [];
+
+    /**
+     * Метод (тип) запроса
+     * @var string
+     */
+    private $method = null;
+
+    /**
+     * Контент запроса (для POST и PUT)
+     * @var string
+     */
+    private $content = null;
 
     /**
      * Request constructor.
@@ -64,6 +87,16 @@ class Request
         curl_setopt($this->curl, CURLOPT_VERBOSE, true);
         curl_setopt($this->curl, CURLOPT_HEADER, true);
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, $this->headers);
+
+        if (in_array($this->method, [self::REQUEST_METHOD_POST, self::REQUEST_METHOD_PUT])) {
+            curl_setopt($this->curl, CURLOPT_POSTFIELDS, $this->content);
+
+            if ($this->method === self::REQUEST_METHOD_POST) {
+                curl_setopt($this->curl, CURLOPT_POST, true);
+            } else {
+                curl_setopt($this->curl, CURLOPT_PUT, true);
+            }
+        }
 
         $response = curl_exec($this->curl);
 
@@ -109,27 +142,21 @@ class Request
      */
     public function setMethod($method)
     {
-        $option = null;
-
-        switch ($method) {
-            case self::REQUEST_METHOD_GET:
-                break;
-            case self::REQUEST_METHOD_POST:
-                $option = CURLOPT_PORT;
-                break;
-            case self::REQUEST_METHOD_PUT:
-                $option = CURLOPT_PUT;
-                break;
-            case self::REQUEST_METHOD_HEAD:
-                break;
-            default:
-                throw new UndefinedRequestMethodException('Метод ' . $method . ' не поддерживается');
+        if (!in_array($method, self::$allowedMethods)) {
+            throw new UndefinedRequestMethodException('Метод ' . $method . ' не поддерживается');
         }
 
-        if (!is_null($option)) {
-            curl_setopt($this->curl, $option, true);
-        }
+        $this->method = $method;
 
         return $this;
+    }
+
+    /**
+     * Устанавливает данные для POST и PUT запросов
+     * @param string $content
+     */
+    public function setContent($content)
+    {
+        $this->content = $content;
     }
 }
