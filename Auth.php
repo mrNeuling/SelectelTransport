@@ -82,6 +82,24 @@ class Auth
     }
 
     /**
+     * Возвращает время действия токена в секундах
+     * @return int
+     */
+    public function getExpireToken()
+    {
+        return $this->expireToken;
+    }
+
+    /**
+     * Возвращает базовый адрес для выполнения операций с хранилищем
+     * @return string
+     */
+    public function getStorageUrl()
+    {
+        return $this->storageUrl;
+    }
+
+    /**
      * Авторизация пользователя Selectel
      * @throws AuthException
      * @throws Exceptions\RequestException
