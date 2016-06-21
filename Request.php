@@ -85,7 +85,9 @@ class Request
      */
     public function setHeaders(array $headers)
     {
-        array_map([$this, 'setHeader'], $headers);
+        foreach ($headers as $name => $value) {
+            $this->setHeader($name, $value);
+        }
 
         return $this;
     }
