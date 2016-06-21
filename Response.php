@@ -54,7 +54,29 @@ class Response
      */
     protected function fillHeaders($response, $headerSize)
     {
-        $this->headers = explode('\r\n\r\n', substr($response, 0, $headerSize));
+        $headersContent = substr($response, 0, $headerSize);
+        
+        $this->headers = self::parseHeaders($headersContent);
+    }
+
+    /**
+     * Распрашивает текст с заголовками ответа и формирует из них массив
+     * @param string $headersContent
+     * @return array
+     */
+    protected static function parseHeaders($headersContent)
+    {
+        $headerLines = explode("\r\n", $headersContent);
+        // Удаляем первую строку ответа (HTTP/1.1 204 No Content)
+        unset($headerLines[0]);
+        
+        $headers = [];
+        foreach (array_filter($headerLines) as $headerLine) {
+            $header = explode(': ', $headerLine);
+            $headers[$header[0]] = $header[1];
+        }
+        
+        return $headers;
     }
 
     /**
