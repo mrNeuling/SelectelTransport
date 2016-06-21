@@ -17,6 +17,7 @@ class Request
     const REQUEST_METHOD_POST = 'POST';
     const REQUEST_METHOD_PUT = 'PUT';
     const REQUEST_METHOD_HEAD = 'HEAD';
+    const REQUEST_METHOD_PURGE = 'PURGE';
 
     /**
      * Массив допустимых методов запросов
@@ -96,6 +97,8 @@ class Request
             } else {
                 curl_setopt($this->curl, CURLOPT_PUT, true);
             }
+        } elseif (in_array($this->method, [self::REQUEST_METHOD_HEAD, self::REQUEST_METHOD_PURGE])) {
+            curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $this->method);
         }
 
         $response = curl_exec($this->curl);
@@ -154,6 +157,7 @@ class Request
     /**
      * Устанавливает данные для POST и PUT запросов
      * @param array $content
+     * @return Request
      */
     public function setContent(array $content)
     {
