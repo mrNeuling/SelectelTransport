@@ -18,6 +18,7 @@ class Request
     const REQUEST_METHOD_PUT = 'PUT';
     const REQUEST_METHOD_HEAD = 'HEAD';
     const REQUEST_METHOD_PURGE = 'PURGE';
+    const REQUEST_METHOD_DELETE = 'DELETE';
 
     /**
      * Массив допустимых методов запросов
@@ -29,6 +30,7 @@ class Request
         self::REQUEST_METHOD_PUT,
         self::REQUEST_METHOD_HEAD,
         self::REQUEST_METHOD_PURGE,
+        self::REQUEST_METHOD_DELETE,
     ];
 
     /**
@@ -112,7 +114,7 @@ class Request
                 curl_setopt($this->curl, CURLOPT_INFILE, $fileHandler);
                 curl_setopt($this->curl, CURLOPT_INFILESIZE, filesize($this->file));
             }
-        } elseif (in_array($this->method, [self::REQUEST_METHOD_HEAD, self::REQUEST_METHOD_PURGE])) {
+        } elseif (in_array($this->method, [self::REQUEST_METHOD_HEAD, self::REQUEST_METHOD_PURGE, self::REQUEST_METHOD_DELETE])) {
 
             curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $this->method);
             
