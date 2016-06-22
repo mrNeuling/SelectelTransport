@@ -1,14 +1,13 @@
 <?php
 
-namespace SelectelTransport;
+namespace SelectelTransport\Response;
 use SelectelTransport\Interfaces\IResponse;
-use SelectelTransport\Response\ResponseJSON;
 
 /**
  * Class Response
  * @package SelectelTransport
  */
-class Response implements IResponse
+class ResponseText implements IResponse
 {
     /**
      * Заголовки ответа
@@ -40,7 +39,7 @@ class Response implements IResponse
      * @param $response
      * @param $headerSize
      * @param string $type
-     * @return Response
+     * @return ResponseText
      */
     public static function factory($httpCode, $response, $headerSize, $type = self::RESPONSE_TYPE_TEXT)
     {

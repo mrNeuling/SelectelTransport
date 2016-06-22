@@ -4,6 +4,8 @@ namespace SelectelTransport;
 
 
 use SelectelTransport\Exceptions\AuthException;
+use SelectelTransport\Request\Request;
+use SelectelTransport\Response\ResponseText;
 
 /**
  * Class Auth
@@ -114,7 +116,7 @@ class Auth
             ])
             ->send();
 
-        if ($response->getCode() !== Response::RESPONSE_CODE_NO_CONTENT) {
+        if ($response->getCode() !== ResponseText::RESPONSE_CODE_NO_CONTENT) {
             throw new AuthException('Ошибка авторизации на сервере Selectel');
         }
 

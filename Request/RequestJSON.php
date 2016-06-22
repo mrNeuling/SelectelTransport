@@ -3,16 +3,14 @@
 namespace SelectelTransport\Request;
 
 
-use SelectelTransport\Request;
-
 class RequestJSON extends Request
 {
-    protected function __construct($url, array $queryParams = [])
+    protected function __construct($url, array $queryParams = [], $type = null)
     {
         $this->queryParams = [
             'format' => 'json'
         ];
         
-        parent::__construct($url, $queryParams);
+        parent::__construct($url, $queryParams, $type);
     }
 }

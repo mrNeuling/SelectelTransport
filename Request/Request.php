@@ -1,14 +1,14 @@
 <?php
 
-namespace SelectelTransport;
+namespace SelectelTransport\Request;
 
 
 use SelectelTransport\Exceptions\InitException;
 use SelectelTransport\Exceptions\RequestException;
 use SelectelTransport\Exceptions\UndefinedRequestMethodException;
 use SelectelTransport\Interfaces\IResponse;
-use SelectelTransport\Request\RequestJSON;
 use SelectelTransport\Interfaces\IRequest;
+use SelectelTransport\Response;
 
 /**
  * Class Request
@@ -81,11 +81,13 @@ class Request implements IRequest
      * Request constructor.
      * @param string $url
      * @param array $queryParams
+     * @param string $type
      */
-    protected function __construct($url, array $queryParams = [])
+    protected function __construct($url, array $queryParams = [], $type = null)
     {
         $this->url = $url;
         $this->queryParams = array_merge($queryParams, $this->queryParams);
+        $this->responseType = $type;
     }
 
     /**
@@ -98,15 +100,15 @@ class Request implements IRequest
     {
         switch ($type) {
             case IResponse::RESPONSE_TYPE_JSON:
-                return new RequestJSON($url, $queryParams);
+                return new RequestJSON($url, $queryParams, $type);
             default:
-                return new self($url);
+                return new self($url, $queryParams, $type);
         }
     }
 
     /**
      * Метод выполнения cURL-запросов
-     * @return Response
+     * @return Response\ResponseText
      * @throws InitException
      * @throws RequestException
      */
@@ -159,7 +161,7 @@ class Request implements IRequest
             throw new RequestException('Ошибка при выволнении запроса');
         }
 
-        $result = Response::factory(
+        $result = Response\ResponseText::factory(
             (int) curl_getinfo($this->curl, CURLINFO_HTTP_CODE),
             $response,
             (int) curl_getinfo($this->curl, CURLINFO_HEADER_SIZE),
