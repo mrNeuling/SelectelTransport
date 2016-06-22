@@ -132,12 +132,16 @@ class Request
         if ($response === false) {
             throw new RequestException('Ошибка при выволнении запроса');
         }
-        
-        return Response::factory(
+
+        $result = Response::factory(
             (int) curl_getinfo($this->curl, CURLINFO_HTTP_CODE),
             $response,
             (int) curl_getinfo($this->curl, CURLINFO_HEADER_SIZE)
         );
+
+        curl_close($this->curl);
+
+        return $result;
     }
 
     /**
