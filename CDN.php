@@ -42,15 +42,17 @@ class CDN
     /**
      * Загружает архив с данными на сервер
      * @param string $filePath
+     * @param string $containerName
      * @return \stdClass[]
+`    * @throws Exceptions\InitException
      * @throws Exceptions\UndefinedRequestMethodException
      * @throws RequestException
      */
-    public function loadArchive($filePath)
+    public function loadArchive($filePath, $containerName = null)
     {
         $token = $this->auth->getToken();
         $request = Request::factory(
-            $this->auth->getStorageUrl() . 'neuling_test/',
+            $this->auth->getStorageUrl() . ($containerName ? $containerName . '/' : ''),
             [
                 'extract-archive' => 'tar'
             ]
