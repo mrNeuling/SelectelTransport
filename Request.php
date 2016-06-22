@@ -28,6 +28,7 @@ class Request
         self::REQUEST_METHOD_POST,
         self::REQUEST_METHOD_PUT,
         self::REQUEST_METHOD_HEAD,
+        self::REQUEST_METHOD_PURGE,
     ];
 
     /**
@@ -99,6 +100,10 @@ class Request
             }
         } elseif (in_array($this->method, [self::REQUEST_METHOD_HEAD, self::REQUEST_METHOD_PURGE])) {
             curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $this->method);
+            
+            if ($this->method === self::REQUEST_METHOD_PURGE) {
+                curl_setopt($this->curl, CURLOPT_POSTFIELDS, $this->content);
+            }
         }
 
         $response = curl_exec($this->curl);
