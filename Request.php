@@ -56,6 +56,12 @@ class Request
     private $content = null;
 
     /**
+     * Список файлов для отправки
+     * @var string
+     */
+    private $file = null;
+
+    /**
      * Request constructor.
      * @param string $url
      * @throws InitException
@@ -85,20 +91,29 @@ class Request
      */
     public function send()
     {
+        $fileHandler = null;
+
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($this->curl, CURLOPT_VERBOSE, true);
         curl_setopt($this->curl, CURLOPT_HEADER, true);
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, $this->headers);
 
-        if (in_array($this->method, [self::REQUEST_METHOD_POST, self::REQUEST_METHOD_PUT])) {
-            curl_setopt($this->curl, CURLOPT_POSTFIELDS, $this->content);
+        if ($this->method === self::REQUEST_METHOD_POST) {
 
-            if ($this->method === self::REQUEST_METHOD_POST) {
-                curl_setopt($this->curl, CURLOPT_POST, true);
-            } else {
-                curl_setopt($this->curl, CURLOPT_PUT, true);
+            curl_setopt($this->curl, CURLOPT_POSTFIELDS, $this->content);
+            curl_setopt($this->curl, CURLOPT_POST, true);
+
+        } elseif ($this->method === self::REQUEST_METHOD_PUT) {
+
+            curl_setopt($this->curl, CURLOPT_PUT, true);
+
+            if (!is_null($this->file)) {
+                $fileHandler = fopen($this->file, 'r');
+                curl_setopt($this->curl, CURLOPT_INFILE, $fileHandler);
+                curl_setopt($this->curl, CURLOPT_INFILESIZE, filesize($this->file));
             }
         } elseif (in_array($this->method, [self::REQUEST_METHOD_HEAD, self::REQUEST_METHOD_PURGE])) {
+
             curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $this->method);
             
             if ($this->method === self::REQUEST_METHOD_PURGE) {
@@ -108,6 +123,10 @@ class Request
 
         $response = curl_exec($this->curl);
 
+        if (isset($fileHandler)) {
+            fclose($fileHandler);
+        }
+        
         if ($response === false) {
             throw new RequestException('Ошибка при выволнении запроса');
         }
@@ -168,6 +187,18 @@ class Request
     {
         $this->content = $content;
         
+        return $this;
+    }
+
+    /**
+     * Регистрирует файл для отправки
+     * @param string $filePath
+     * @return $this
+     */
+    public function setFile($filePath)
+    {
+        $this->file = $filePath;
+
         return $this;
     }
 }
