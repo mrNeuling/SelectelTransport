@@ -6,25 +6,21 @@ namespace SelectelTransport;
 use SelectelTransport\Exceptions\InitException;
 use SelectelTransport\Exceptions\RequestException;
 use SelectelTransport\Exceptions\UndefinedRequestMethodException;
+use SelectelTransport\Interfaces\IResponse;
+use SelectelTransport\Request\RequestJSON;
+use SelectelTransport\Interfaces\IRequest;
 
 /**
  * Class Request
  * @package SelectelTransport
  */
-class Request
+class Request implements IRequest
 {
-    const REQUEST_METHOD_GET = 'GET';
-    const REQUEST_METHOD_POST = 'POST';
-    const REQUEST_METHOD_PUT = 'PUT';
-    const REQUEST_METHOD_HEAD = 'HEAD';
-    const REQUEST_METHOD_PURGE = 'PURGE';
-    const REQUEST_METHOD_DELETE = 'DELETE';
-
     /**
      * Массив допустимых методов запросов
      * @var array
      */
-    private static $allowedMethods = [
+    protected static $allowedMethods = [
         self::REQUEST_METHOD_GET,
         self::REQUEST_METHOD_POST,
         self::REQUEST_METHOD_PUT,
@@ -37,64 +33,93 @@ class Request
      * Ссылка на объект cUrl
      * @var null|resource
      */
-    private $curl = null;
+    protected $curl = null;
+
+    /**
+     * URL, на который будем обращаться
+     * @var null|string
+     */
+    protected $url = null;
+
+    /**
+     * Параметры запроса (для метода GET)
+     * @var array
+     */
+    protected $queryParams = [];
 
     /**
      * Массив заголовков запроса
      * @var array
      */
-    private $headers = [];
+    protected $headers = [];
 
     /**
      * Метод (тип) запроса
      * @var string
      */
-    private $method = null;
+    protected $method = null;
 
     /**
      * Контент запроса (для POST и PUT)
      * @var array
      */
-    private $content = null;
+    protected $content = null;
 
     /**
      * Список файлов для отправки
      * @var string
      */
-    private $file = null;
+    protected $file = null;
+
+    /**
+     * Тип формата ответа
+     * @var string
+     */
+    protected $responseType = IResponse::RESPONSE_TYPE_TEXT;
 
     /**
      * Request constructor.
      * @param string $url
-     * @throws InitException
+     * @param array $queryParams
      */
-    private function __construct($url)
+    protected function __construct($url, array $queryParams = [])
     {
-        $this->curl = curl_init($url);
-        
-        if (!$this->curl) {
-            throw new InitException('Не удалось инициализировать сеанс cURL');
-        }
+        $this->url = $url;
+        $this->queryParams = array_merge($queryParams, $this->queryParams);
     }
 
     /**
      * @param string $url URL, на который подаются запросы
+     * @param array $queryParams
+     * @param string $type
      * @return Request
      */
-    public static function factory($url)
+    public static function factory($url, array $queryParams = [], $type = null)
     {
-        return new static($url);
+        switch ($type) {
+            case IResponse::RESPONSE_TYPE_JSON:
+                return new RequestJSON($url, $queryParams);
+            default:
+                return new self($url);
+        }
     }
 
     /**
      * Метод выполнения cURL-запросов
      * @return Response
+     * @throws InitException
      * @throws RequestException
      */
     public function send()
     {
         $fileHandler = null;
 
+        $this->curl = curl_init(http_build_query($this->queryParams));
+        
+        if (!$this->curl) {
+            throw new InitException('Не удалось инициализировать сеанс cURL');
+        }
+        
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($this->curl, CURLOPT_VERBOSE, true);
         curl_setopt($this->curl, CURLOPT_HEADER, true);
@@ -136,7 +161,8 @@ class Request
         $result = Response::factory(
             (int) curl_getinfo($this->curl, CURLINFO_HTTP_CODE),
             $response,
-            (int) curl_getinfo($this->curl, CURLINFO_HEADER_SIZE)
+            (int) curl_getinfo($this->curl, CURLINFO_HEADER_SIZE),
+            $this->responseType
         );
 
         curl_close($this->curl);

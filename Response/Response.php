@@ -1,37 +1,34 @@
 <?php
 
 namespace SelectelTransport;
+use SelectelTransport\Interfaces\IResponse;
+use SelectelTransport\Response\ResponseJSON;
 
 /**
  * Class Response
  * @package SelectelTransport
  */
-class Response
+class Response implements IResponse
 {
-    const RESPONSE_CODE_OK = 200;
-    const RESPONSE_CODE_CREATED = 201;
-    const RESPONSE_CODE_NO_CONTENT = 204;
-    const RESPONSE_CODE_FORBIDDEN = 403;
-
     /**
      * Заголовки ответа
      * @var array
      */
-    private $headers = [];
+    protected $headers = [];
 
     /**
      * Содержимое ответа
      * @var null
      */
-    private $content = null;
+    protected $content = null;
 
     /**
      * HTTP-код ответа
      * @var null
      */
-    private $httpCode = null;
+    protected $httpCode = null;
 
-    private function __construct($httpCode, $response, $headerSize)
+    protected function __construct($httpCode, $response, $headerSize)
     {
         $this->httpCode = $httpCode;
         $this->fillHeaders($response, $headerSize);
@@ -42,11 +39,17 @@ class Response
      * @param $httpCode
      * @param $response
      * @param $headerSize
+     * @param string $type
      * @return Response
      */
-    public static function factory($httpCode, $response, $headerSize)
+    public static function factory($httpCode, $response, $headerSize, $type = self::RESPONSE_TYPE_TEXT)
     {
-        return new static($httpCode, $response, $headerSize);
+        switch ($type) {
+            case IResponse::RESPONSE_TYPE_JSON:
+                return new ResponseJSON($httpCode, $response, $headerSize);
+            default:
+                return new self($httpCode, $response, $headerSize);
+        }
     }
 
     /**
