@@ -4,6 +4,7 @@ namespace SelectelTransport;
 
 
 use SelectelTransport\Exceptions\RequestException;
+use SelectelTransport\Interfaces\IRequest;
 use SelectelTransport\Interfaces\IResponse;
 use SelectelTransport\Request\Request;
 
@@ -61,7 +62,7 @@ class CDN
                 'Accept' => 'application/json',
             ])
             ->setFile($filePath)
-            ->setMethod(Request::REQUEST_METHOD_PUT)
+            ->setMethod(IRequest::REQUEST_METHOD_PUT)
             ->send();
 
         if ($response->getCode() !== IResponse::RESPONSE_CODE_CREATED) {
@@ -86,7 +87,7 @@ class CDN
             ->setHeaders([
                 'X-Auth-Token' => $token,
             ])
-            ->setMethod(Request::REQUEST_METHOD_HEAD)
+            ->setMethod(IRequest::REQUEST_METHOD_HEAD)
             ->send();
 
         return [
@@ -131,7 +132,7 @@ class CDN
             ->setHeaders([
                 'X-Auth-Token' => $token,
             ])
-            ->setMethod(Request::REQUEST_METHOD_HEAD)
+            ->setMethod(IRequest::REQUEST_METHOD_HEAD)
             ->send();
 
         return [
@@ -186,7 +187,7 @@ class CDN
             ->setHeaders([
                 'X-Auth-Token' => $token,
             ])
-            ->setMethod(Request::REQUEST_METHOD_DELETE)
+            ->setMethod(IRequest::REQUEST_METHOD_DELETE)
             ->send();
 
         if ($response->getCode() !== IResponse::RESPONSE_CODE_NO_CONTENT) {
@@ -232,7 +233,7 @@ class CDN
             ->setHeaders([
                 'X-Auth-Token' => $token,
             ])
-            ->setMethod(Request::REQUEST_METHOD_HEAD)
+            ->setMethod(IRequest::REQUEST_METHOD_HEAD)
             ->send();
 
         return $response->getCode() === IResponse::RESPONSE_CODE_OK;
