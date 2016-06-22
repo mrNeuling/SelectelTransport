@@ -114,7 +114,8 @@ class Request implements IRequest
     {
         $fileHandler = null;
 
-        $this->curl = curl_init(http_build_query($this->queryParams));
+        $queryParams = http_build_query($this->queryParams);
+        $this->curl = curl_init($this->url . ($queryParams ? '?' . $queryParams : ''));
         
         if (!$this->curl) {
             throw new InitException('Не удалось инициализировать сеанс cURL');
