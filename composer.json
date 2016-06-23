@@ -1,0 +1,19 @@
+{
+  "name": "mrNeuling/SelectelTransport",
+  "version": "1.0.0",
+  "authors": [
+    {
+      "name": "Sergey Bakaldin",
+      "email": "mrNeuling@gmail.com",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": ">=5.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "SelectelTransport\\": ""
+    }
+  }
+}
