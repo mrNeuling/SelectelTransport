@@ -13,8 +13,7 @@
   },
   "autoload": {
     "psr-4": {
-      "SelectelTransport\\": "",
-      "mrNeuling\\SelectelTransport\\": ""
+      "SelectelTransport\\": ""
     }
   }
 }
