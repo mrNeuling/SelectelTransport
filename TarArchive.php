@@ -32,21 +32,19 @@ class TarArchive
     public function makeFromDirectory($dirName)
     {
         $dir = opendir($dirName);
+        $currentDir = getcwd();
+        chdir($dirName);
+
         while (($item = readdir($dir)) !== false) {
             if (self::isExcludedDir($item)) continue;
 
-            $subItem = $dirName . '/' . $item;
-            if (is_dir($subItem)) {
-                $currentDir = getcwd();
-                chdir($dirName);
-
+            if (is_dir($item)) {
                 $this->addSubDirectory($item);
-
-                chdir($currentDir);
-            } else {
-                $this->archive->addFile($subItem, $item);
             }
         }
+        chdir($currentDir);
+        
+        $this->archive->buildFromDirectory($dirName);
     }
 
     /**
@@ -63,8 +61,6 @@ class TarArchive
             $subItem = $dirName . '/' . $item;
             if (is_dir($subItem)) {
                 $this->addSubDirectory($subItem);
-            } else {
-                $this->archive->addFile($subItem);
             }
         }
     }
