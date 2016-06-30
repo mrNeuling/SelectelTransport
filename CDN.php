@@ -177,8 +177,8 @@ class CDN
      * Удаляет файл из контейнера
      * @param string $containerName
      * @param string $filePath
+     * @return int
      * @throws Exceptions\UndefinedRequestMethodException
-     * @throws RequestException
      */
     public function deleteFile($containerName, $filePath)
     {
@@ -192,9 +192,7 @@ class CDN
             ->setMethod(IRequest::REQUEST_METHOD_DELETE)
             ->send();
 
-        if ($response->getCode() !== IResponse::RESPONSE_CODE_NO_CONTENT) {
-            throw new RequestException('Ошибка удаления файла');
-        }
+        return $response->getCode();
     }
 
     /**
