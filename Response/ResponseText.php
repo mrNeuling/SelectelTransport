@@ -10,6 +10,11 @@ use SelectelTransport\Interfaces\IResponse;
 class ResponseText implements IResponse
 {
     /**
+     * Разделитель названия и значения заголовка
+     */
+    const HTTP_HEADER_DELIMITER = ': ';
+
+    /**
      * Заголовки ответа
      * @var array
      */
@@ -71,12 +76,10 @@ class ResponseText implements IResponse
     protected static function parseHeaders($headersContent)
     {
         $headerLines = explode("\r\n", $headersContent);
-        // Удаляем первую строку ответа (HTTP/1.1 204 No Content)
-        unset($headerLines[0]);
         
         $headers = [];
-        foreach (array_filter($headerLines) as $headerLine) {
-            $header = explode(': ', $headerLine);
+        foreach (array_filter($headerLines, ['self', 'filterHeaderLine']) as $headerLine) {
+            $header = explode(self::HTTP_HEADER_DELIMITER, $headerLine);
             $headers[$header[0]] = $header[1];
         }
         
@@ -91,6 +94,16 @@ class ResponseText implements IResponse
     protected function fillContent($response, $headerSize)
     {
         $this->content = substr($response, $headerSize);
+    }
+
+    /**
+     * Проверяет, является ли строка строкой с парой КЛЮЧ: ЗНАЧЕНИЕ HTTP-заголовка
+     * @param string $line
+     * @return bool
+     */
+    protected static function filterHeaderLine($line)
+    {
+        return strpos($line, self::HTTP_HEADER_DELIMITER) !== false;
     }
 
     /**
