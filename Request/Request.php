@@ -126,6 +126,7 @@ class Request implements IRequest
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($this->curl, CURLOPT_VERBOSE, true);
         curl_setopt($this->curl, CURLOPT_HEADER, true);
+        curl_setopt($this->curl, CURLOPT_CONNECTTIMEOUT, 0);
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, $this->headers);
 
         if ($this->method === self::REQUEST_METHOD_POST) {
