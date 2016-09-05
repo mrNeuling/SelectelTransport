@@ -44,7 +44,7 @@ class CDN
      * @param string $filePath
      * @param string $containerName
      * @return \stdClass[]
-`    * @throws Exceptions\InitException
+     * @throws Exceptions\InitException
      * @throws Exceptions\UndefinedRequestMethodException
      * @throws RequestException
      */
