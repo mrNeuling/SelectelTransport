@@ -115,7 +115,7 @@ class CDN
             ])
             ->send();
 
-        return $response->getContent();
+        return json_decode($response->getContent());
     }
 
     /**
@@ -170,7 +170,7 @@ class CDN
             ])
             ->send();
 
-        return $response->getContent();
+        return json_decode($response->getContent());
     }
 
     /**
