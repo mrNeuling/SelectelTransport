@@ -85,13 +85,15 @@ class CDN
      * Поддерживается два параметра:
      * deleteAt - время, когда нужно удалить файл. Указывается в формате unix timestamp
      * deleteAfter - время, через которое нужно удалить файл. Указывается в секундах
+     * @return string Ссылка на загруженный файл
      * @throws RequestException
      */
     public function loadFile($containerName, $sourceFilePath, $resultFilePath = null, array $options = [])
     {
         $filePath = $resultFilePath ?: basename($sourceFilePath);
         $token = $this->auth->getToken();
-        $request = Request::factory($this->auth->getStorageUrl() . ($containerName ? $containerName . '/' : '') . $filePath);
+        $fileURL = $this->auth->getStorageUrl() . ($containerName ? $containerName . '/' : '') . $filePath;
+        $request = Request::factory($fileURL);
 
         $headers = [
             'X-Auth-Token' => $token,
@@ -113,6 +115,8 @@ class CDN
         if ($response->getCode() !== IResponse::RESPONSE_CODE_CREATED) {
             throw new RequestException($response->getContent());
         }
+
+        return $fileURL;
     }
 
     /**
