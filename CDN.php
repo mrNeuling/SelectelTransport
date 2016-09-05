@@ -75,6 +75,47 @@ class CDN
     }
 
     /**
+     * Загружает файл на сервер
+     * @param string $containerName Имя контейнера, в который будет загружен файл
+     * @param string $sourceFilePath Путь к загружаемому файлу
+     * @param string|null $resultFilePath Путь внутри контейнера
+     * Наличие созданных папок в указанном пути необязательно.
+     * Если не указано, то имя файла будет взято из $sourceFilePath
+     * @param array $options Массив дополнительных параметров запроса
+     * Поддерживается два параметра:
+     * deleteAt - время, когда нужно удалить файл. Указывается в формате unix timestamp
+     * deleteAfter - время, через которое нужно удалить файл. Указывается в секундах
+     * @throws RequestException
+     */
+    public function loadFile($containerName, $sourceFilePath, $resultFilePath = null, array $options = [])
+    {
+        $filePath = $resultFilePath ?: basename($sourceFilePath);
+        $token = $this->auth->getToken();
+        $request = Request::factory($this->auth->getStorageUrl() . ($containerName ? $containerName . '/' : '') . $filePath);
+
+        $headers = [
+            'X-Auth-Token' => $token,
+            'Accept' => 'application/json',
+        ];
+
+        if (isset($options['deleteAt'])) {
+            $headers['X-Delete-At'] = $options['deleteAt'];
+        } elseif (isset($options['deleteAfter'])) {
+            $headers['X-Delete-After'] = $options['deleteAfter'];
+        }
+
+        $response = $request
+            ->setHeaders($headers)
+            ->setFile($sourceFilePath)
+            ->setMethod(IRequest::REQUEST_METHOD_PUT)
+            ->send();
+
+        if ($response->getCode() !== IResponse::RESPONSE_CODE_CREATED) {
+            throw new RequestException($response->getContent());
+        }
+    }
+
+    /**
      * Возвращает информацию о хранилище
      * @return array
      * @throws Exceptions\UndefinedRequestMethodException
